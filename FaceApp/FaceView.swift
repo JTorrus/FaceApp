@@ -14,6 +14,9 @@ class FaceView: UIView {
     var faceScale: CGFloat = 0.90
     
     @IBInspectable
+    var mouthCurvature: Double = 1.0
+    
+    @IBInspectable
     var faceCenter: CGPoint {
         return CGPoint(x: bounds.midX, y: bounds.midY)
     }
@@ -43,7 +46,22 @@ class FaceView: UIView {
     }
     
     func pathForEye(_ eye: Eye) -> UIBezierPath {
-        return UIBezierPath()
+        func centerOfEye(_ eye: Eye) -> CGPoint {
+            let eyeOffset = faceRadius / Ratios.faceRadiusToEyeOffset
+            var eyeCenter = faceCenter
+            
+            eyeCenter.y -= eyeOffset
+            eyeCenter.x += ((eye == Eye.left ) ? -1 : 1) * eyeOffset
+            
+            return eyeCenter
+        }
+        
+        let eyeRadius = faceRadius / Ratios.faceRadiusToEyeRadius
+        let eyeCenter = centerOfEye(eye)
+        let path: UIBezierPath = UIBezierPath(arcCenter: eyeCenter, radius: eyeRadius, startAngle: 0, endAngle: CGFloat(2 * Double.pi), clockwise: true)
+        
+        path.lineWidth = faceLineWidth
+        return path
     }
     
     func pathForMouth() -> UIBezierPath {
